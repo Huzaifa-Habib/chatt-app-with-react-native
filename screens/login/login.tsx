@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import axios from "axios";
 import {
   SafeAreaView,
@@ -8,9 +8,13 @@ import {
   View,
   TouchableHighlight,
   TextInput,
+  Alert,
 
 } from 'react-native';
-let baseUrl = "http://localhost:3000";
+import { Form,FormItem } from 'react-native-form-component';
+
+let baseUrl = "http://192.168.10.5:3000";
+
 
 
 
@@ -19,24 +23,28 @@ function Login ({navigation})  {
   const [isFocus1, setIsFocus1] = useState(false)
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const emailInput = useRef();
+  const passwordInput = useRef()
+
 
 
 
 
   const logInHandler = async () =>{
     try {
-     const response = await axios.post(`${baseUrl}/api/v1/login`, {
+      const response = await axios.post(`${baseUrl}/api/v1/login`, {
         email:email,
         password:password
       },{ withCredentials: true })
+      console.log(response.data.message)
+      navigation.navigate("Home")
+      emailInput.current.clear()
+      passwordInput.current.clear()
 
-      console.log(response)
-
-
-      
-    } catch (error) {
-      console.log(error)
-      
+    } catch (error:any) {
+        Alert.alert(error.message)
+        
+        
     }
 
 
@@ -56,77 +64,69 @@ function Login ({navigation})  {
      
             <View style={loginStyles.subDiv}>
               <Text style = {loginStyles.heading}>Login to continue</Text>
+              <Form onButtonPress={logInHandler} buttonTextStyle = {{fontSize:20}} buttonText = "Log In" buttonStyle = {{
+                backgroundColor:"dodgerblue",
+                marginTop:8,
+                width:"60%",
+                display:"flex",
+                justifyContent:"center",
+                alignSelf:"center",
+              }}>
 
-              <TextInput
-                style = {{
-                  height: 60,
-                  borderWidth: 2,
-                  width:"100%",
-                  color:"black",
-                  marginTop:8,
-                  borderRadius:5,
-                  fontSize:18,
-                  paddingLeft:10,
-                  borderColor:isFocus1 === false ? "#d1d5db" : "dodgerblue",
+                <FormItem
+                  style = {{
+                    height: 60,
+                    borderWidth: 2,
+                    width:"100%",
+                    color:"black",
+                    borderRadius:5,
+                    fontSize:18,
+                    paddingLeft:10,
+                    borderColor:isFocus1 === false ? "#d1d5db" : "dodgerblue",
                   
-                }}
-                autoComplete="email" 
-                placeholder='Enter email'
-                placeholderTextColor={"#9ca3af"}
-                keyboardType = "email-address"
-                onFocus = {() => setIsFocus1(true)}
-                onBlur = {() =>{setIsFocus1(false)}}
-                autoCapitalize = "none"
-                onChangeText={(text) => setEmail(text)}
-
-              />
-  
-              <TextInput
-                style = {{
-                  height: 60,
-                  borderWidth: 2,
-                  width:"100%",
-                  color:"black",
-                  marginTop:15,
-                  borderRadius:5,
-                  fontSize:18,
-                  paddingLeft:10,
-                  borderColor:isFocus === false ? "#d1d5db":"dodgerblue",
-
-                  
-                  
-              }}
-                autoComplete="password" 
-                placeholder='Enter password'
-                placeholderTextColor={"#9ca3af"}
-                maxLength={20}
-                secureTextEntry = {true}
-                onFocus = {() => setIsFocus(true)}
-                onBlur = {() =>{setIsFocus(false)}}
-                onChangeText={(text) => setPassword(text)}
-
-                
-
-                
-                
-              />
-
-
-
-         
-
-            <TouchableHighlight>
-               <Text style = {loginStyles.button}onPress={logInHandler}>Log In</Text>
-            </TouchableHighlight>
+                  }}
+                  label="Enter Email"
+                  isRequired
+                  value={email}
+                  onChangeText={(email) => setEmail(email)}
+                  floatingLabel = {true}
+                  autoComplete="email" 
+                  keyboardType = "email-address"
+                  onFocus = {() => setIsFocus1(true)}
+                  onBlur = {() =>{setIsFocus1(false)}}
+                  autoCapitalize = "none"
+                  labelStyle = {{ color:"#9ca3af" }}
+                  ref = {emailInput}
               
-  
-                    
-                     
+                />
+        
+                <FormItem
+                  style = {{
+                    height: 60,
+                    borderWidth: 2,
+                    width:"100%",
+                    color:"black",
+                    borderRadius:5,
+                    fontSize:18,
+                    paddingLeft:10,
+                    borderColor:isFocus === false ? "#d1d5db":"dodgerblue",  
+                  }}
+                  label="Enter Password"
+                  value={password}
+                  isRequired
+                  autoComplete="password-new" 
+                  maxLength={20}
+                  secureTextEntry = {true}
+                  onFocus = {() => setIsFocus(true)}
+                  onBlur = {() =>{setIsFocus(false)}}
+                  onChangeText={(text) => setPassword(text)}
+                  floatingLabel = {true}
+                  labelStyle = {{ color:"#9ca3af" }}
+                  ref = {passwordInput}
+                />
+              </Form>
+      
             </View>
-
-  
-    
-          
         </SafeAreaView>
   
     )

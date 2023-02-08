@@ -1,6 +1,4 @@
 import * as React from 'react';
-import {NavigationContainer} from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import axios from "axios";
 import { useState, useRef } from 'react';
 import {
@@ -10,6 +8,8 @@ import {
   View,
   TouchableHighlight,
   TextInput,
+  Alert
+
 
 } from 'react-native';
 import { Form,FormItem } from 'react-native-form-component';
@@ -31,28 +31,45 @@ function Signup ({ navigation })  {
   const [password, setPassword] = useState("");
   const emailInput = useRef();
   const passwordInput = useRef()
-  const firstNameInput= useRef();
-  const lastInput= useRef()
+  const lastNameRef = useRef()
+  const firstNameRef = useRef()
+  const [firstNameEmptyError,setFirstNameEmptyError] = useState(false)
+  const [lastNameEmptyError,setLastNameEmptyError] = useState(false)
+
 
 
 
   const signupHandler = async () => {
+    if (firstName === "") {
+      console.log("Error")
+      setFirstNameEmptyError(true)
+    }
+    if (lastName === "") {
+      setLastNameEmptyError(true)
+    }
 
-  
-
-    // try {
-    //   const response = await axios.post(`${baseUrl}/api/v1/login`, {
-    //      email:email,
-    //      password:password
-    //    },{ withCredentials: true })
-    //    console.log(response)
+    try {
+      const response = await axios.post(`${baseUrl}/api/v1/signup`, {
+        firstName: firstName,
+        lastName: lastName,
+        email:email,
+        password:password,
+       })
+       console.log(response)
+       emailInput.current.clear()
+       passwordInput.current.clear()
+       firstNameRef.current.clear()
+       lastNameRef.current.clear()
+       navigation.navigate("Login")
 
  
        
-    //  } catch (error) {
-    //    console.log(error)
+     } catch (error) {
+       console.log(error)
+
+
        
-    //  }
+     }
 
 
   }
@@ -70,7 +87,18 @@ function Signup ({ navigation })  {
  
         <View style={styles.subDiv}>
           <Text style = {styles.heading}>Register Yourself</Text>
-          <Form onButtonPress={signupHandler}>
+          <Form onButtonPress={signupHandler} buttonTextStyle = {{fontSize:20}} buttonText = "Register" buttonStyle = {{
+            backgroundColor:"dodgerblue",
+            marginTop:10,
+            width:"50%",
+            display:"flex",
+            justifyContent:"center",
+            alignSelf:"center",
+            }}>
+            
+            
+
+             
             
             <View style = {styles.nameSec}>
               <FormItem
@@ -83,7 +111,7 @@ function Signup ({ navigation })  {
                 borderRadius:5,
                 fontSize:18,
                 paddingLeft:10,
-                borderColor:isFocus2 === false ? "#d1d5db" : "dodgerblue",
+                borderColor:firstNameEmptyError === true ? "red" : isFocus2 === true ? "dodgerblue" :"#d1d5db"
                 
               }}
               label = "First Name"
@@ -96,12 +124,7 @@ function Signup ({ navigation })  {
               autoCorrect
               labelStyle = {{ color:"#9ca3af" }}
               isRequired
-              ref = {firstNameInput}
-
-              
-
-
-
+              underneathTextStyle={{display:"none"}}
             />
 
             <FormItem
@@ -114,7 +137,7 @@ function Signup ({ navigation })  {
                 borderRadius:5,
                 fontSize:18,
                 paddingLeft:10,
-                borderColor:isFocus3 === false ? "#d1d5db" : "dodgerblue",
+                borderColor:lastNameEmptyError === true ? "red" : isFocus3 === true ? "dodgerblue" :"#d1d5db",
                 marginLeft:10
 
                 
@@ -122,23 +145,18 @@ function Signup ({ navigation })  {
               label="Last name"
               isRequired
               value={lastName}
-              onChangeText={(email) => setEmail(email)}
+              onChangeText={(text) => setLastName(text)}
               floatingLabel = {true}
-              autoComplete="email" 
+              autoComplete="username-new" 
               onFocus = {() => setIsFocus3(true)}
               onBlur = {() =>{setIsFocus3(false)}}
               autoCapitalize = "none"
               labelStyle = {{ color:"#9ca3af" }}
-              ref = {lastInput}
-
-
-
-
-
+            
 
           />
 
-            </View>
+        </View>
 
 
           <FormItem
@@ -192,10 +210,6 @@ function Signup ({ navigation })  {
             floatingLabel = {true}
             labelStyle = {{ color:"#9ca3af" }}
             ref = {passwordInput}
-
-
-
-
           />
 
         </Form>
@@ -267,8 +281,8 @@ function Signup ({ navigation })  {
     },
 
     nameSec: {
-      // flexDirection:"row",
-      // justifyContent: "space-between"
+      flexDirection:"row",
+      justifyContent: "space-between"
 
     },
   

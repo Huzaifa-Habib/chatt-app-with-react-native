@@ -4,17 +4,11 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import {
   SafeAreaView,
   ScrollView,
-  StatusBar,
   StyleSheet,
   Text,
-  useColorScheme,
   View,
-  Platform,
   Image,
-  Linking,
-  TouchableHighlight,
   TextInput,
-  ImageBackground,
   Button,
 
 
@@ -32,19 +26,18 @@ function Home ({navigation})  {
                         uri: 'https://img.icons8.com/color/1x/whatsapp.png',
                         }}
   
-                    />
-                    <TextInput
-                     style = {styles.searchInput}
-                     autoComplete='username' 
-                     placeholder='Search...'
-                     placeholderTextColor={"white"}
-                     inputMode='text'
-                     maxLength={20}/>
-                     
+                    />            
   
                 </View>
                 <ScrollView style = {styles.userListDiv}>
-                    <View style = {styles._user} >
+                    <TextInput
+                        style = {styles.searchInput}
+                        autoComplete='username' 
+                        placeholder='Search...'
+                        placeholderTextColor={"gray"}
+                        inputMode='text'
+                        maxLength={20}/>
+                    <View style = {styles._user1} >
                         <Image
                             style = {styles.profileImg}
                             source={{
@@ -113,16 +106,17 @@ const styles = StyleSheet.create({
     },
   
     searchInput: {
-        height: 40,
-        borderWidth: 1,
-        borderColor:"white",
-        width:"80%",
-        color:"white",
+        height: 50,
+        borderWidth: 3,
+        borderColor:"dodgerblue",
+        width:"95%",
+        color:"black",
         paddingLeft:10,
-        marginLeft:20,
+        marginLeft:5,
         marginTop:8,
         borderRadius:10,
         fontSize:16,
+        
     },
   
     _user:{
@@ -132,6 +126,15 @@ const styles = StyleSheet.create({
         marginBottom:10
     
     },
+
+    _user1:{
+        marginTop:40,
+        display:"flex",
+        flexDirection:"row",
+        marginBottom:10
+    
+    },
+  
   
   
   
