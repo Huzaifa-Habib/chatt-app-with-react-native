@@ -1,6 +1,4 @@
 import * as React from 'react';
-import {NavigationContainer} from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import {
   SafeAreaView,
   ScrollView,
@@ -15,7 +13,7 @@ import {
 } from 'react-native';
 
 
-function Home ({navigation})  {
+function Home ()  {
     return(
         <SafeAreaView style = {styles.mainDiv}>
             <ScrollView style = {styles.subDiv}>

@@ -13,13 +13,15 @@ import {
 
 } from 'react-native';
 import { Form,FormItem } from 'react-native-form-component';
+import { Link,useNavigate} from "react-router-native";
+
 
 let baseUrl = "http://localhost:3000";
 
 
 
 
-function Signup ({ navigation })  {
+function Signup ()  {
 
   const [isFocus, setIsFocus] = useState(false)
   const [isFocus1, setIsFocus1] = useState(false)
@@ -30,11 +32,25 @@ function Signup ({ navigation })  {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const emailInput = useRef();
-  const passwordInput = useRef()
-  const lastNameRef = useRef()
+  const passwordInput= useRef()
+  const lastNameRef= useRef()
   const firstNameRef = useRef()
-  const [firstNameEmptyError,setFirstNameEmptyError] = useState(false)
-  const [lastNameEmptyError,setLastNameEmptyError] = useState(false)
+  const [firstNameEmptyError,setFirstNameEmptyError] = useState("")
+  const [lastNameEmptyError,setLastNameEmptyError] = useState("")
+  const [errorTxt,setErrorTxt] = useState("")
+  const [errorTxt1,setErrorTxt1] = useState("")
+  const [errorTxt2,setErrorTxt2] = useState("")
+  const [emailErr,setEmailErr] = useState(false)
+  const [passErr,setPassErr] = useState(false)
+  const [firstErr,setFirstErr] = useState(false)
+  const [lastErr,setLastErr] = useState(false)
+
+
+  let navigate = useNavigate()
+  let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/;
+
+
+
 
 
 
@@ -42,11 +58,58 @@ function Signup ({ navigation })  {
   const signupHandler = async () => {
     if (firstName === "") {
       console.log("Error")
-      setFirstNameEmptyError(true)
+      setFirstNameEmptyError("*Required")
+      setFirstErr(true)
     }
+
+    else{
+      setFirstNameEmptyError("")
+      setFirstErr(false)
+    }
+
     if (lastName === "") {
-      setLastNameEmptyError(true)
+      setLastNameEmptyError("*Required")
+      setLastErr(true)
     }
+
+    else{
+      setLastNameEmptyError("")
+      setLastErr(false)
+
+
+    }
+
+    if (email === ""){
+      setErrorTxt("*Required")
+      setErrorTxt1("")
+      setEmailErr(true)
+    }
+
+    else if(reg.test(email) === false ){
+      setErrorTxt1("Email Is Not Valid")
+      setErrorTxt("")
+      setEmailErr(true)
+
+    }
+    else{
+      setErrorTxt("")
+      setErrorTxt1("")
+      setEmailErr(false)
+
+    }
+
+    if (password === ""){
+      setErrorTxt2("*Required")
+      setPassErr(true)
+
+    }
+
+    else{
+      setErrorTxt2("")
+      setPassErr(false)
+
+    }
+  
 
     try {
       const response = await axios.post(`${baseUrl}/api/v1/signup`, {
@@ -56,18 +119,15 @@ function Signup ({ navigation })  {
         password:password,
        })
        console.log(response)
+       navigate("/")
        emailInput.current.clear()
        passwordInput.current.clear()
        firstNameRef.current.clear()
        lastNameRef.current.clear()
-       navigation.navigate("Login")
-
- 
+       
        
      } catch (error) {
-       console.log(error)
-
-
+       Alert.alert(`${error.response.data.message || "SignUp Failed!"}`);        
        
      }
 
@@ -79,29 +139,22 @@ function Signup ({ navigation })  {
      <SafeAreaView style={styles.mainDiv}>
       <View style = {styles.navBar}>
         <Text style = {styles.logo}>Chat App</Text>
-
-        <Text style = {styles.link} onPress = {() => navigation.navigate("Login")}>Log In</Text>
+        <Link to={"/login"} underlayColor = "transparent" style = {{marginLeft:"auto"}}>
+          <Text style = {styles.link} onPress = {() =>navigate("/login")}>Log In</Text>
+        </Link>
 
 
       </View>
  
         <View style={styles.subDiv}>
           <Text style = {styles.heading}>Register Yourself</Text>
-          <Form onButtonPress={signupHandler} buttonTextStyle = {{fontSize:20}} buttonText = "Register" buttonStyle = {{
-            backgroundColor:"dodgerblue",
-            marginTop:10,
-            width:"50%",
-            display:"flex",
-            justifyContent:"center",
-            alignSelf:"center",
-            }}>
-            
-            
-
-             
-            
+      
             <View style = {styles.nameSec}>
-              <FormItem
+              <View>
+                {(firstNameEmptyError !== "")? <Text style = {{color:"red", position:"absolute",top:-12}}>{firstNameEmptyError}</Text>:null}
+              </View>
+
+              <TextInput
               style = {{
                 height: 60,
                 borderWidth: 2,
@@ -111,23 +164,22 @@ function Signup ({ navigation })  {
                 borderRadius:5,
                 fontSize:18,
                 paddingLeft:10,
-                borderColor:firstNameEmptyError === true ? "red" : isFocus2 === true ? "dodgerblue" :"#d1d5db"
+                borderColor:firstErr === true ? "red" : isFocus2 === true ? "dodgerblue" :"#d1d5db"
                 
               }}
-              label = "First Name"
+              placeholder= "First Name"
               value={firstName}
               autoComplete="username-new" 
-              floatingLabel = {true}
               onFocus = {() => setIsFocus2(true)}
               onBlur = {() =>{setIsFocus2(false)}}
               onChangeText={(text) => setFirstName(text)}
               autoCorrect
-              labelStyle = {{ color:"#9ca3af" }}
-              isRequired
-              underneathTextStyle={{display:"none"}}
             />
+            <View>
+              {(lastNameEmptyError !== "")? <Text style = {{color:"red", position:"absolute",top:-12,left:10}}>{lastNameEmptyError}</Text>:null}
+            </View>
 
-            <FormItem
+            <TextInput
               style = {{
                 height: 60,
                 borderWidth: 2,
@@ -137,29 +189,29 @@ function Signup ({ navigation })  {
                 borderRadius:5,
                 fontSize:18,
                 paddingLeft:10,
-                borderColor:lastNameEmptyError === true ? "red" : isFocus3 === true ? "dodgerblue" :"#d1d5db",
+                borderColor:lastErr=== true ? "red" : isFocus3 === true ? "dodgerblue" :"#d1d5db",
                 marginLeft:10
 
                 
               }}
-              label="Last name"
-              isRequired
+              placeholder = {"Last Name"}
               value={lastName}
               onChangeText={(text) => setLastName(text)}
-              floatingLabel = {true}
               autoComplete="username-new" 
               onFocus = {() => setIsFocus3(true)}
               onBlur = {() =>{setIsFocus3(false)}}
               autoCapitalize = "none"
-              labelStyle = {{ color:"#9ca3af" }}
             
 
           />
 
         </View>
+        
 
 
-          <FormItem
+
+
+          <TextInput
             style = {{
               height: 60,
               borderWidth: 2,
@@ -168,26 +220,26 @@ function Signup ({ navigation })  {
               borderRadius:5,
               fontSize:18,
               paddingLeft:10,
-              borderColor:isFocus1 === false ? "#d1d5db" : "dodgerblue",
-            
+              borderColor:emailErr === true?"red":isFocus1 === false ? "#d1d5db" : "dodgerblue",
+              marginTop:10 
+
             }}
-            label="Enter Email"
-            isRequired
+            placeholder="Enter Email"
             value={email}
             onChangeText={(email) => setEmail(email)}
-            floatingLabel = {true}
             autoComplete="email" 
             keyboardType = "email-address"
             onFocus = {() => setIsFocus1(true)}
             onBlur = {() =>{setIsFocus1(false)}}
             autoCapitalize = "none"
-            labelStyle = {{ color:"#9ca3af" }}
             ref = {emailInput}
             
           />
+          {(errorTxt !== "")? <Text style = {{color:"red"}}>{errorTxt}</Text>:null}
+          {(errorTxt1 !== "")? <Text style = {{color:"red"}}>{errorTxt1}</Text>:null}
      
 
-          <FormItem
+          <TextInput
             style = {{
               height: 60,
               borderWidth: 2,
@@ -196,27 +248,23 @@ function Signup ({ navigation })  {
               borderRadius:5,
               fontSize:18,
               paddingLeft:10,
-              borderColor:isFocus === false ? "#d1d5db":"dodgerblue",  
+              borderColor:passErr === true ? "red": isFocus === false ? "#d1d5db":"dodgerblue", 
+              marginTop:10 
           }}
-            label="Enter Password"
+            placeholder="Enter Password"
             value={password}
-            isRequired
             autoComplete="password-new" 
             maxLength={20}
             secureTextEntry = {true}
             onFocus = {() => setIsFocus(true)}
             onBlur = {() =>{setIsFocus(false)}}
             onChangeText={(text) => setPassword(text)}
-            floatingLabel = {true}
-            labelStyle = {{ color:"#9ca3af" }}
             ref = {passwordInput}
-          />
+          />                     
+          {(errorTxt2 !== "")? <Text style = {{color:"red"}} >{errorTxt2}</Text>:null}
+          <Text onPress={signupHandler} style = {styles.button}>Register</Text>
 
-        </Form>
-          
-
-                
-                 
+         
         </View>
 
 
@@ -282,9 +330,13 @@ function Signup ({ navigation })  {
 
     nameSec: {
       flexDirection:"row",
-      justifyContent: "space-between"
+      justifyContent: "space-between",
+      marginTop:5,
+
 
     },
+
+ 
   
     button: {
       backgroundColor:"dodgerblue",

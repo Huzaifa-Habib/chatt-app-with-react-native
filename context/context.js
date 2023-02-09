@@ -1,14 +1,11 @@
 import React, { createContext, useReducer } from 'react'
 import { reducer } from './reducer';
 
-export const GlobalContext = createContext("Initial Value");
 
 let data = {
-  isLogin: null,
+  isLogin:null,
   user:{},
-  baseUrlSocketIo: (window.location.href.includes('localhost'))
-  ?
-  `http://localhost:3000` : ``
+  baseUrl:"http://192.168.10.2:3000",
 }
 
 export default function ContextProvider({ children }) {
@@ -19,3 +16,7 @@ export default function ContextProvider({ children }) {
     </GlobalContext.Provider>
   )
 }
+
+export const GlobalContext = createContext({ state: data, dispatch:null  });
+
+

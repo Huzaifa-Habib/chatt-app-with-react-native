@@ -1,49 +1,94 @@
 import * as React from 'react';
-import { useState, useRef } from 'react';
+import { useState, useRef,useContext } from 'react';
 import axios from "axios";
+import { GlobalContext } from '../../context/context';
 import {
   SafeAreaView,
   StyleSheet,
   Text,
   View,
-  TouchableHighlight,
   TextInput,
   Alert,
+  Linking,
+  Image
 
 } from 'react-native';
 import { Form,FormItem } from 'react-native-form-component';
-
-let baseUrl = "http://192.168.10.5:3000";
-
-
+import { Link,useNavigate} from "react-router-native";
+import Signup from '../signup/signup';
 
 
-function Login ({navigation})  {
+function Login ()  {
   const [isFocus, setIsFocus] = useState(false)
   const [isFocus1, setIsFocus1] = useState(false)
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const emailInput = useRef();
   const passwordInput = useRef()
+  const [error,setError] = useState(false)
+  const [error1,setError1] = useState(false)
+  const [errorTxt,setErrorTxt] = useState("")
+  const [errorTxt1,setErrorTxt1] = useState("")
+  const [errorTxt2,setErrorTxt2] = useState("")
 
 
 
-
+  let navigate = useNavigate()
+  let { state, dispatch } = useContext(GlobalContext);
+  console.log(state)
+  let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/;
 
   const logInHandler = async () =>{
+
+    if (email === ""){
+      setErrorTxt("Can't Leave Field Empty")
+      setErrorTxt1("")
+      setError(true)
+    }
+
+    else if(reg.test(email) === false ){
+      setErrorTxt1("Email Is Not Valid")
+      setError(true)
+      setErrorTxt("")
+    }
+    else{
+      setErrorTxt("")
+      setErrorTxt1("")
+      setError(false)
+
+    }
+
+    if (password === ""){
+      setErrorTxt2("Can't Leave Field Empty")
+      setError1(true)
+
+
+    }
+
+    else{
+      setErrorTxt2("")
+      setError1(false)
+
+    }
+  
+
     try {
-      const response = await axios.post(`${baseUrl}/api/v1/login`, {
+      const response = await axios.post(`${state.baseUrl}/api/v1/login`, {
         email:email,
         password:password
       },{ withCredentials: true })
       console.log(response.data.message)
-      navigation.navigate("Home")
       emailInput.current.clear()
       passwordInput.current.clear()
+      navigate("/home")
+      dispatch({
+        type: 'USER_LOGIN',
+        payload: null
+      })
 
-    } catch (error:any) {
-        Alert.alert(error.message)
-        
+    } catch (error) {
+      console.log(error)
+              
         
     }
 
@@ -56,24 +101,15 @@ function Login ({navigation})  {
         <SafeAreaView style={loginStyles.mainDiv}>
           <View style = {loginStyles.navBar}>
             <Text style = {loginStyles.logo}>Chat App</Text>
+              <Text style = {loginStyles.link} onPress = {() => navigate("/signup")}>Sign Up</Text>
 
-            <Text style = {loginStyles.link} onPress = {() => navigation.navigate("Signup")}>Sign Up</Text>
 
 
           </View>
      
             <View style={loginStyles.subDiv}>
-              <Text style = {loginStyles.heading}>Login to continue</Text>
-              <Form onButtonPress={logInHandler} buttonTextStyle = {{fontSize:20}} buttonText = "Log In" buttonStyle = {{
-                backgroundColor:"dodgerblue",
-                marginTop:8,
-                width:"60%",
-                display:"flex",
-                justifyContent:"center",
-                alignSelf:"center",
-              }}>
-
-                <FormItem
+              <Text style = {loginStyles.heading} >Login to continue</Text>
+                <TextInput
                   style = {{
                     height: 60,
                     borderWidth: 2,
@@ -82,25 +118,29 @@ function Login ({navigation})  {
                     borderRadius:5,
                     fontSize:18,
                     paddingLeft:10,
-                    borderColor:isFocus1 === false ? "#d1d5db" : "dodgerblue",
+                    borderColor:error === true ? "red": isFocus1 === true ? "dodgerblue" :"#d1d5db",
+                    marginTop:20
+
                   
                   }}
-                  label="Enter Email"
-                  isRequired
+                  placeholder="Enter Email"
+                  
                   value={email}
                   onChangeText={(email) => setEmail(email)}
-                  floatingLabel = {true}
                   autoComplete="email" 
                   keyboardType = "email-address"
                   onFocus = {() => setIsFocus1(true)}
                   onBlur = {() =>{setIsFocus1(false)}}
                   autoCapitalize = "none"
-                  labelStyle = {{ color:"#9ca3af" }}
                   ref = {emailInput}
+
               
                 />
+                {(errorTxt !== "")? <Text>{errorTxt}</Text>:null}
+                {(errorTxt1 !== "")? <Text>{errorTxt1}</Text>:null}
+
         
-                <FormItem
+                <TextInput
                   style = {{
                     height: 60,
                     borderWidth: 2,
@@ -109,23 +149,26 @@ function Login ({navigation})  {
                     borderRadius:5,
                     fontSize:18,
                     paddingLeft:10,
-                    borderColor:isFocus === false ? "#d1d5db":"dodgerblue",  
+                    borderColor:error1 === true ? "red" : isFocus === true ? "dodgerblue" :"#d1d5db", 
+                    marginTop:20
+
                   }}
-                  label="Enter Password"
+                  placeholder="Enter Password"
                   value={password}
-                  isRequired
                   autoComplete="password-new" 
                   maxLength={20}
                   secureTextEntry = {true}
                   onFocus = {() => setIsFocus(true)}
                   onBlur = {() =>{setIsFocus(false)}}
                   onChangeText={(text) => setPassword(text)}
-                  floatingLabel = {true}
-                  labelStyle = {{ color:"#9ca3af" }}
                   ref = {passwordInput}
+
                 />
-              </Form>
-      
+                {(errorTxt2 !== "")? <Text>{errorTxt2}</Text>:null}
+
+                
+              <Text onPress={logInHandler} style = {loginStyles.button}>Log In</Text>
+
             </View>
         </SafeAreaView>
   
