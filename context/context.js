@@ -3,9 +3,9 @@ import { reducer } from './reducer';
 
 
 let data = {
-  isLogin:null,
+  isLogin:false,
   user:{},
-  baseUrl:"http://192.168.10.2:3000",
+  baseUrl:"http://192.168.10.5:3000",
 }
 
 export default function ContextProvider({ children }) {
@@ -17,6 +17,8 @@ export default function ContextProvider({ children }) {
   )
 }
 
-export const GlobalContext = createContext({ state: data, dispatch:null  });
+export const GlobalContext = createContext({ state: data, dispatch:null });
+
+
 
 

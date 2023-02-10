@@ -80,11 +80,12 @@ function Login ()  {
       console.log(response.data.message)
       emailInput.current.clear()
       passwordInput.current.clear()
-      navigate("/home")
       dispatch({
         type: 'USER_LOGIN',
         payload: null
       })
+      navigate("/")
+
 
     } catch (error) {
       console.log(error)

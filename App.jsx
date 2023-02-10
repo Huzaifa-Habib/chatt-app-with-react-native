@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useState, useEffect, useContext } from 'react';
+import { useEffect, useContext } from 'react';
 import {
   SafeAreaView,
   ActivityIndicator,
@@ -17,62 +17,61 @@ import axios from 'axios';
 
 const App = () => {
   let { state, dispatch } = useContext(GlobalContext);
-  console.log(state,dispatch)
+  console.log(state)
+  const getProfile = async () => {
+    try {
+      let response = await axios.get(`${state?.baseUrl}/api/v1/profile`, {
+        withCredentials: true
+      })
+      console.log("Profile: ", response);
+      dispatch({
+        type: 'USER_LOGIN',
+        payload:response.data
+      })
+    } catch (error) {
 
-  useEffect(() => {
-    const getProfile = async () => {
-      try {
-        let response = await axios.get(`${state?.baseUrl}/api/v1/profile`, {
-          withCredentials: true
-        })
-        console.log("Profile: ", response);
-        dispatch({
-          type: 'USER_LOGIN',
-          payload:response.data
-        })
-      } catch (error) {
-
-        console.log("axios error: ", error.response.message);
-        dispatch({
-          type: 'USER_LOGOUT'
-        })
-      }
+      console.log("axios error: ", error);
+      dispatch({
+        type: 'USER_LOGOUT'
+      })
     }
-    getProfile();
-
+  }
+  useEffect(() => {
+    getProfile()
+   
 }, [])
 
 
   
   return (
       <SafeAreaView>
-        <NativeRouter>
+        <ContextProvider>
           {(state?.isLogin === true)?
+        <NativeRouter>
             <Routes>
               <Route path='/' element = {<Home/>}/>
               <Route path="/signup" element={<Signup />} />
               <Route path="/login" element={<Login/>}/>
             </Routes>
+        </NativeRouter>
             :
             null
           }
-        </NativeRouter>
 
-        <NativeRouter>
           {(state?.isLogin === false)?
+        <NativeRouter>
             <Routes>
               <Route path='/' element = {<Login/>}/>
               <Route path="/signup" element={<Signup />} />
-              <Route path="*" element={<Login/>}/>
             </Routes>
+        </NativeRouter>
             :
             null
           }
 
-        </NativeRouter>
 
-        <NativeRouter>
           {(state?.isLogin === null)?
+        <NativeRouter>
             <View style = {{
               width:"100%",
               height:"100%",
@@ -83,10 +82,11 @@ const App = () => {
             }}>
                 <ActivityIndicator size={"large"} color = "dodgerblue"/>
             </View>
+        </NativeRouter>
             :
             null
           }
-        </NativeRouter>
+          </ContextProvider>
 
       </SafeAreaView>
 
